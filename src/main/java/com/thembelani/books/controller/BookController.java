@@ -13,4 +13,9 @@ public class BookController {
     public String firstAPI() {
         return "Hello Thembelani!";
     }
+
+    @GetMapping("/api")
+    public String firstAPIPath(){
+        return "Thembelani Ngema!";
+    }
 }
