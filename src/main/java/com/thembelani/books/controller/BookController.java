@@ -4,10 +4,7 @@ package com.thembelani.books.controller;
 // so we know what is sent in and will return data to the client
 
 import com.thembelani.books.entity.Book;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,5 +62,16 @@ public class BookController {
             }
         }
         return null;
+    }
+
+    @PostMapping("/api/books")
+    public void createBook(@RequestBody Book newBook) {
+
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(newBook.getTitle())) {
+                return;
+            }
+        }
+        books.add(newBook);
     }
 }
