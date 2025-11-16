@@ -88,21 +88,30 @@ public class BookController {
     @Operation(summary = "Update a book", description = "Update the details of an existing book")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{id}")
-    public void updateBook(@Parameter(description = "ID of the book to be updated") @PathVariable @Min(value = 1) long id, @Valid @RequestBody BookRequest bookRequest) {
+    public Book updateBook(@Parameter(description = "ID of the book to be updated") @PathVariable @Min(value = 1) long id, @Valid @RequestBody BookRequest bookRequest) {
 
         for (int i = 0; i < books.size(); i++) {
             if (books.get(i).getId() == id) {
                 Book updatedBook = convertToBook(id, bookRequest);
                 books.set(i, updatedBook);
-                return;
+                return updatedBook;
             }
+
         }
+        throw new BookNotFoundException("Book not found - "+id);
     }
 
     @Operation(summary = "Delete a book", description = "Remove a book from a list")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void deleteBook(@Parameter(description = "ID of the book to delete") @PathVariable @Min(value = 1) long id) {
+
+        books.stream()
+                .filter(book -> book.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new BookNotFoundException("Book not found - " + id)); //Check if the book exists and thrown an error if not
+        /* before attempting to delete */
+
         books.removeIf(book -> book.getId() == id);
     }
 
