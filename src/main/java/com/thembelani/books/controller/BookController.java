@@ -69,10 +69,11 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public void updateBook(@PathVariable long id, @RequestBody Book updatedBook) {
+    public void updateBook(@PathVariable long id, @RequestBody BookRequest bookRequest) {
 
         for (int i = 0; i < books.size(); i++) {
             if (books.get(i).getId() == id) {
+                Book updatedBook = convertToBook(id,bookRequest);
                 books.set(i, updatedBook);
                 return;
             }
