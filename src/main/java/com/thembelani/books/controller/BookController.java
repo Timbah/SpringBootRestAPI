@@ -4,6 +4,8 @@ package com.thembelani.books.controller;
 // so we know what is sent in and will return data to the client
 
 import com.thembelani.books.entity.Book;
+import com.thembelani.books.exception.BookErrorResponse;
+import com.thembelani.books.exception.BookNotFoundException;
 import com.thembelani.books.request.BookRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,12 +13,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Tag(name="Books Rest API Endpoints",description = "Operations related to books")
+@Tag(name = "Books Rest API Endpoints", description = "Operations related to books")
 @RestController
 @RequestMapping("/api/books") //Adds /api/books to every endppint inside this java file
 public class BookController {
@@ -39,13 +42,13 @@ public class BookController {
         ));
     }
 
-    @Operation(summary = "Hello world test endpoint",description = "ping")
+    @Operation(summary = "Hello world test endpoint", description = "ping")
     @GetMapping("/hello")  //no path specified, so this means at the root path, the below method will be called
     public String firstAPI() {
         return "Hello Thembelani!";
     }
 
-    @Operation(summary = "Get all books",description = "Retrieve a list of all available books")
+    @Operation(summary = "Get all books", description = "Retrieve a list of all available books")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public List<Book> getBooks(@Parameter(description = "Optional query parameter") @RequestParam(required = false) String category) {
@@ -59,7 +62,7 @@ public class BookController {
                 .toList();
     }
 
-    @Operation(summary = "Get a book by ID",description = "Retrieve a specific book by its ID")
+    @Operation(summary = "Get a book by ID", description = "Retrieve a specific book by its ID")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public Book getBookById(@Parameter(description = "ID of the book to be retrieved ") @PathVariable @Min(value = 1) long id) {
@@ -67,10 +70,10 @@ public class BookController {
         return books.stream()
                 .filter(book -> book.getId() == id)
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new BookNotFoundException("Book not found - " + id));
     }
 
-    @Operation(summary = "Create a new book",description = "Add a new book to the list")
+    @Operation(summary = "Create a new book", description = "Add a new book to the list")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public void createBook(@Valid @RequestBody BookRequest bookRequest) {
@@ -82,10 +85,10 @@ public class BookController {
         books.add(book);
     }
 
-    @Operation(summary = "Update a book",description = "Update the details of an existing book")
+    @Operation(summary = "Update a book", description = "Update the details of an existing book")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{id}")
-    public void updateBook( @Parameter(description = "ID of the book to be updated") @PathVariable @Min(value = 1) long id, @Valid @RequestBody BookRequest bookRequest) {
+    public void updateBook(@Parameter(description = "ID of the book to be updated") @PathVariable @Min(value = 1) long id, @Valid @RequestBody BookRequest bookRequest) {
 
         for (int i = 0; i < books.size(); i++) {
             if (books.get(i).getId() == id) {
@@ -96,7 +99,7 @@ public class BookController {
         }
     }
 
-    @Operation(summary = "Delete a book",description = "Remove a book from a list")
+    @Operation(summary = "Delete a book", description = "Remove a book from a list")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void deleteBook(@Parameter(description = "ID of the book to delete") @PathVariable @Min(value = 1) long id) {
@@ -110,5 +113,16 @@ public class BookController {
                 bookRequest.getAuthor(),
                 bookRequest.getCategory(),
                 bookRequest.getRating());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<BookErrorResponse> handleException(BookNotFoundException exc) {
+
+        BookErrorResponse bookErrorResponse = new BookErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                exc.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(bookErrorResponse, HttpStatus.NOT_FOUND);
     }
 }
