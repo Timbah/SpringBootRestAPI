@@ -22,12 +22,12 @@ public class BookController {
     private void initializeBooks() {
 
         books.addAll(List.of(
-                new Book("Title One", "Author One", "Science"),
-                new Book("Title Two", "Author One", "Science"),
-                new Book("Title Three", "Author One", "History"),
-                new Book("Title Four", "Author One", "Math"),
-                new Book("Title Five", "Author One", "Math"),
-                new Book("Title Six", "Author One", "Math")
+                new Book(1, "Computer Science Pro", "Chad Darby", "Computer Science", 5),
+                new Book(2, "java Spring Master", "Eric Roby", "Computer Science", 5),
+                new Book(3, "Why 1+1 Rocks", "Adil A.", "Math", 5),
+                new Book(4, "How Bears Hibernate", "Bob B.", "Science", 2),
+                new Book(5, "A Pirate's Treasure", "Curt C.", "History", 3),
+                new Book(6, "Why 2+2 is Better", "Dan D.", "Math", 1)
         ));
     }
 
@@ -48,16 +48,13 @@ public class BookController {
                 .toList();
     }
 
-    @GetMapping("/{title}") //THe parameter doesn't necessary need to be at the end.
-    // i.e. something like /api/books/{title}/findByTitle would work
-    public Book getBookByTitle(@PathVariable String title) {
+    @GetMapping("/{id}")
+    public Book getBookById(@PathVariable long id) {
 
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                return book;
-            }
-        }
-        return null;
+        return books.stream()
+                .filter(book -> book.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
     @PostMapping
@@ -71,19 +68,19 @@ public class BookController {
         }
     }
 
-    @PutMapping("/{title}")
-    public void updateBook(@PathVariable String title, @RequestBody Book updatedBook) {
+    @PutMapping("/{id}")
+    public void updateBook(@PathVariable long id, @RequestBody Book updatedBook) {
 
         for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getTitle().equalsIgnoreCase((title))) {
+            if (books.get(i).getId() == id) {
                 books.set(i, updatedBook);
                 return;
             }
         }
     }
 
-    @DeleteMapping("/{title}")
-    public void deleteBook(@PathVariable String title) {
-        books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
+    @DeleteMapping("/{id}")
+    public void deleteBook(@PathVariable long id) {
+        books.removeIf(book -> book.getId() == id);
     }
 }
