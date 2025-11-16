@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/books") //Adds /api/books to every endppint inside this java file
 public class BookController {
 
     private final List<Book> books = new ArrayList<>();
@@ -30,17 +31,12 @@ public class BookController {
         ));
     }
 
-    @GetMapping  //no path specified, so this means at the root path, the below method will be called
+    @GetMapping("/hello")  //no path specified, so this means at the root path, the below method will be called
     public String firstAPI() {
         return "Hello Thembelani!";
     }
 
-    @GetMapping("/api")
-    public String firstAPIPath() {
-        return "Thembelani Ngema!";
-    }
-
-    @GetMapping("/api/books")
+    @GetMapping
     public List<Book> getBooks(@RequestParam(required = false) String category) {
 
         if (category == null) {
@@ -52,7 +48,7 @@ public class BookController {
                 .toList();
     }
 
-    @GetMapping("/api/books/{title}") //THe parameter doesn't necessary need to be at the end.
+    @GetMapping("/{title}") //THe parameter doesn't necessary need to be at the end.
     // i.e. something like /api/books/{title}/findByTitle would work
     public Book getBookByTitle(@PathVariable String title) {
 
@@ -64,7 +60,7 @@ public class BookController {
         return null;
     }
 
-    @PostMapping("/api/books")
+    @PostMapping
     public void createBook(@RequestBody Book newBook) {
 
         boolean isNewBook = books.stream()
@@ -75,7 +71,7 @@ public class BookController {
         }
     }
 
-    @PutMapping("/api/books/{title}")
+    @PutMapping("/{title}")
     public void updateBook(@PathVariable String title, @RequestBody Book updatedBook) {
 
         for (int i = 0; i < books.size(); i++) {
@@ -86,7 +82,7 @@ public class BookController {
         }
     }
 
-    @DeleteMapping("/api/books/{title}")
+    @DeleteMapping("/{title}")
     public void deleteBook(@PathVariable String title) {
         books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
     }
