@@ -5,6 +5,8 @@ package com.thembelani.books.controller;
 
 import com.thembelani.books.entity.Book;
 import com.thembelani.books.request.BookRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public Book getBookById(@PathVariable long id) {
+    public Book getBookById(@PathVariable @Min(value = 1) long id) {
 
         return books.stream()
                 .filter(book -> book.getId() == id)
@@ -59,7 +61,7 @@ public class BookController {
     }
 
     @PostMapping
-    public void createBook(@RequestBody BookRequest bookRequest) {
+    public void createBook(@Valid @RequestBody BookRequest bookRequest) {
 
         long id = books.isEmpty() ? 1 : books.getLast().getId() + 1; //Ensure that the id is always last id +1
 
@@ -69,11 +71,11 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public void updateBook(@PathVariable long id, @RequestBody BookRequest bookRequest) {
+    public void updateBook(@PathVariable @Min(value = 1) long id, @Valid @RequestBody BookRequest bookRequest) {
 
         for (int i = 0; i < books.size(); i++) {
             if (books.get(i).getId() == id) {
-                Book updatedBook = convertToBook(id,bookRequest);
+                Book updatedBook = convertToBook(id, bookRequest);
                 books.set(i, updatedBook);
                 return;
             }
@@ -81,7 +83,7 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteBook(@PathVariable long id) {
+    public void deleteBook(@PathVariable @Min(value = 1) long id) {
         books.removeIf(book -> book.getId() == id);
     }
 
