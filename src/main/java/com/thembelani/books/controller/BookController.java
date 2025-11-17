@@ -4,7 +4,6 @@ package com.thembelani.books.controller;
 // so we know what is sent in and will return data to the client
 
 import com.thembelani.books.entity.Book;
-import com.thembelani.books.exception.BookErrorResponse;
 import com.thembelani.books.exception.BookNotFoundException;
 import com.thembelani.books.request.BookRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -98,7 +96,7 @@ public class BookController {
             }
 
         }
-        throw new BookNotFoundException("Book not found - "+id);
+        throw new BookNotFoundException("Book not found - " + id);
     }
 
     @Operation(summary = "Delete a book", description = "Remove a book from a list")
@@ -124,25 +122,5 @@ public class BookController {
                 bookRequest.getRating());
     }
 
-    @ExceptionHandler
-    public ResponseEntity<BookErrorResponse> handleException(BookNotFoundException exc) {
 
-        BookErrorResponse bookErrorResponse = new BookErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                exc.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(bookErrorResponse, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler  //Default exception handling for any other EXCEPTION not being book not found exists
-    public ResponseEntity<BookErrorResponse> handleException(Exception exc) {
-
-        BookErrorResponse bookErrorResponse = new BookErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                "Invalid Request",
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(bookErrorResponse, HttpStatus.BAD_REQUEST);
-    }
 }
